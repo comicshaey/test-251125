@@ -6,10 +6,11 @@
   <meta name="color-scheme" content="light" />
   <title>부서별 본예산 편성 내역 산출기</title>
   <link rel="icon" href="/static/favicon.ico" />
-  <link rel="stylesheet" href="/static/style.css" />
   <script src="/static/disable-copy.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+    <main class="container" style="max-width:880px; margin:0 auto; padding:24px 16px;">
   <header class="site-header">
     <div class="shell">
       <h1>부서별 본예산 편성 내역 산출기</h1>
@@ -21,7 +22,9 @@
     </div>
   </header>
 
-  <main>
+
+
+<!-- ================================ 구분선 ================================ -->
     <!-- 안내 섹션 -->
     <section class="section">
       <h2>사이트 설명 및 사용 방법 안내</h2>
@@ -31,9 +34,35 @@
         ·단가, 운영 기간, 횟수, 사회보험료 부과금액 등을 반영하여 <b>"총 소요 예산" 및 "산출식"</b>을 자동 생성함.<br/>
         <br/>
       </p>
-
     </section>
 
+      
+<!-- ================================ 구분선 ================================ -->
+      
+    <!-- 행정실 자체 예산 -->
+    <section class="section">
+      <h2>교육행정실 자체 예산</h2>
+      <p class="muted">
+        교육행정실에서 직접 편성하는 <b>사무용품·비품·시설수선·업무추진 관련 예산</b> 소요액을<br>
+        일관된 기준으로 산출하기 위한 계산기입니다. :contentReference[oaicite:5]{index=5}
+      </p>
+
+      <div class="card">
+        <a class="btn" href="./administration-office-budget-calculator/">
+          교육행정실 예산 계산기
+        </a>
+        <p class="btn-desc">
+          · 사무용품, OA장비 유지보수, 프린터 토너, 시설경미수선비 등 반복 항목 위주.<br>
+          · 전년 실적 및 학교 규모를 고려한 “권장 편성 범위”를 제시하는 방향으로 확장 예정.
+        </p>
+      </div>
+    </section>
+
+      
+<!-- ================================ 구분선 ================================ -->
+
+
+      
     <!-- 늘봄·방과후 / 학생 교육 프로그램 관련 -->
     <section class="section">
       <h2>늘봄학교 업무 관련 (늘봄전담실)</h2>
@@ -53,60 +82,9 @@
       </div>
     </section>
 
-    <!-- 급식실 / 보건·위생 관련 -->
-    <section class="section">
-      <h2>급식 업무 관련 (조리실 및 영양교사실)</h2>
-      <p class="muted">
-        ·조리 도구, 위생·소독, 소모품, 시설 수선 등 산출함 <br/>
-      </p>
 
-      <div class="card">
-        <a class="btn" href="./school-cafeteria-budget-calculator/">
-          급식 관련 예산 계산기
-        </a>
-        <p class="btn-desc">
-          ·조리실 위생 용품, 소독제, 유니폼 (위생복), 조리 기구, 소모품, 시설·기구 수선비 등 필요 수량 입력하면 산출됨. <br/>
-          ·조리환경 안전 등이 확보되는 최소 수준 이상으로 편성해야 함. <br/>
-        </p>
-      </div>
-    </section>
-
-    <!-- 유치원 -->
-    <section class="section">
-      <h2>병설유치원 교육 활동 관련</h2>
-      <p class="muted">
-        ·병설유치원의 놀이, 체험, 행사, 간식, 교재 교구 등 교육활동을 위한 예산 산출 <br/>
-      </p>
-
-      <div class="card">
-        <a class="btn" href="./kindergarten-budget-calculator/">
-          병설유치원 예산 계산기
-        </a>
-        <p class="btn-desc">
-          · 유아 수, 활동 회수, 1인당 단가 설정을 통해 체험학습·행사·간식비 등을 자동 계산.<br>
-          · 유치원 교육과정 편성 계획과 연계 가능한 구조로 설계 예정. <br/>
-        </p>
-      </div>
-    </section>
-
-    <!-- 특수교육 -->
-    <section class="section">
-      <h2>특수학급 교육 활동 업무 관련 예산</h2>
-      <p class="muted">
-        ·특수학급 교육 활동을 위한 맞춤형 교구, 보조 공학 기기, 치료 지원, 체험 활동 등의 예산 산출 <br/>
-      </p>
-
-      <div class="card">
-        <a class="btn" href="./special-education-budget-calculator/">
-          특수교육 활동 관련 예산 계산기
-        </a>
-        <p class="btn-desc">
-          ·학생 수, 지원 유형 (치료·보조공학·체험), 연간 횟수 등에 따라 세부 항목별 소요액을 산출함 <br/>
-          ·(동일 항목 반복 요구 시, 전년도 대비 증감 확인할 수 있도록 기능 개선 예정) <br/>
-        </p>
-      </div>
-    </section>
-
+      
+<!-- ================================ 구분선 ================================ -->
     <!-- 과학정보부 / 연구부 / 체육부 / 인성안전부 -->
     <section class="section">
       <h2>교육과정·정보·체육·인성·안전 관련</h2>
@@ -153,25 +131,70 @@
       </div>
     </section>
 
-    <!-- 행정실 자체 예산 -->
+
+
+<!-- ================================ 구분선 ================================ -->
+    <!-- 유치원 -->
     <section class="section">
-      <h2>교육행정실 자체 예산</h2>
+      <h2>병설유치원 교육 활동 관련</h2>
       <p class="muted">
-        교육행정실에서 직접 편성하는 <b>사무용품·비품·시설수선·업무추진 관련 예산</b> 소요액을<br>
-        일관된 기준으로 산출하기 위한 계산기입니다. :contentReference[oaicite:5]{index=5}
+        ·병설유치원의 놀이, 체험, 행사, 간식, 교재 교구 등 교육활동을 위한 예산 산출 <br/>
       </p>
 
       <div class="card">
-        <a class="btn" href="./administration-office-budget-calculator/">
-          교육행정실 예산 계산기
+        <a class="btn" href="./kindergarten-budget-calculator/">
+          병설유치원 예산 계산기
         </a>
         <p class="btn-desc">
-          · 사무용품, OA장비 유지보수, 프린터 토너, 시설경미수선비 등 반복 항목 위주.<br>
-          · 전년 실적 및 학교 규모를 고려한 “권장 편성 범위”를 제시하는 방향으로 확장 예정.
+          · 유아 수, 활동 회수, 1인당 단가 설정을 통해 체험학습·행사·간식비 등을 자동 계산.<br>
+          · 유치원 교육과정 편성 계획과 연계 가능한 구조로 설계 예정. <br/>
         </p>
       </div>
     </section>
 
+<!-- ================================ 구분선 ================================ -->
+      
+    <!-- 급식실 / 보건·위생 관련 -->
+    <section class="section">
+      <h2>급식 업무 관련 (조리실 및 영양교사실)</h2>
+      <p class="muted">
+        ·조리 도구, 위생·소독, 소모품, 시설 수선 등 산출함 <br/>
+      </p>
+
+      <div class="card">
+        <a class="btn" href="./school-cafeteria-budget-calculator/">
+          급식 관련 예산 계산기
+        </a>
+        <p class="btn-desc">
+          ·조리실 위생 용품, 소독제, 유니폼 (위생복), 조리 기구, 소모품, 시설·기구 수선비 등 필요 수량 입력하면 산출됨. <br/>
+          ·조리환경 안전 등이 확보되는 최소 수준 이상으로 편성해야 함. <br/>
+        </p>
+      </div>
+    </section>
+      
+<!-- ================================ 구분선 ================================ -->
+    <!-- 특수교육 -->
+    <section class="section">
+      <h2>특수학급 교육 활동 업무 관련 예산</h2>
+      <p class="muted">
+        ·특수학급 교육 활동을 위한 맞춤형 교구, 보조 공학 기기, 치료 지원, 체험 활동 등의 예산 산출 <br/>
+      </p>
+
+      <div class="card">
+        <a class="btn" href="./special-education-budget-calculator/">
+          특수교육 활동 관련 예산 계산기
+        </a>
+        <p class="btn-desc">
+          ·학생 수, 지원 유형 (치료·보조공학·체험), 연간 횟수 등에 따라 세부 항목별 소요액을 산출함 <br/>
+          ·(동일 항목 반복 요구 시, 전년도 대비 증감 확인할 수 있도록 기능 개선 예정) <br/>
+        </p>
+      </div>
+    </section>
+
+
+
+
+<!-- ================================ 구분선 ================================ -->
     <!-- 추후 추가 예정 안내 -->
     <section class="section">
       <h2>추가 예정 및 운영 원칙</h2>
@@ -197,6 +220,13 @@
   <script src="/static/global-loader.js?v=1"></script>
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 

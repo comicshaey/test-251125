@@ -351,3 +351,71 @@ hr {
   font-size: 0.85rem;
   color: #555;
 }
+
+
+/* ===== 공통: 테이블이 가로폭 넘으면 자동 스크롤 ===== */
+.table-wrap,
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;  /* 모바일 부드러운 스크롤 */
+  margin-top: 12px;
+  padding-bottom: 4px; /* 스크롤바 숨김 방지 여백 */
+}
+
+/* 테이블 최소 너비 지정, 어휴 씨 되게 많네 */
+.table-wrap table,
+.table-wrapper table {
+  min-width: 800px; /* 기본값, 필요하면 조정 가능 */
+  border-collapse: collapse;
+}
+
+
+
+/* =========================================
+   ★ 전역 레이아웃 통일 패치 (251126)
+   header / main / footer 모두 동일 폭 사용
+   ========================================= */
+
+/* header, footer도 shell 폭(880px) 안에 정렬 */
+.site-header .shell,
+.site-footer .shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 16px;  /* main과 동일 여백 */
+}
+
+/* 메인으로 돌아가기 버튼도 shell 분위기와 통일 */
+.home-link-wrap {
+  max-width: 880px;
+  margin: 16px auto 0;
+  padding: 0 16px;
+  display: flex;
+  justify-content: flex-start;   /* 가운데 → 왼쪽 정렬 */
+  flex-wrap: wrap;               /* 넘치면 자동 줄바꿈 */
+  gap: 8px;
+}
+
+/* 메인으로 돌아가기 버튼이 좁은 화면에서 깨지지 않게 */
+.btn-home {
+  white-space: nowrap;          /* 버튼 줄바꿈 방지 */
+  flex-shrink: 0;               /* 폭 부족해도 눌리지 않게 */
+}
+
+/* 모든 table-wrapper, table-wrap 의 폭도 shell 안에서 통일 */
+.table-wrapper,
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 12px 0;
+  padding-bottom: 6px;
+}
+
+/* 내부 테이블은 최소 너비 확보 (내용 늘어나면 스크롤) */
+.table-wrapper table,
+.table-wrap table {
+  min-width: 800px; /* 필요하면 1000~1200px로 조정 가능 */
+  border-collapse: collapse;
+}
+

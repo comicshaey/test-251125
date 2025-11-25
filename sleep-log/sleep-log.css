@@ -1,0 +1,181 @@
+/* 수면일지 전용 스타일 */
+
+/* 입력 영역 레이아웃 */
+.sleep-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 16px;
+  margin-top: 12px;
+  align-items: flex-end;
+}
+
+.sleep-controls .field-label {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+/* 기록 종류 라디오 버튼 묶음 */
+.sleep-type-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 0.9rem;
+}
+
+.sleep-type-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 범례 */
+.sleep-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 0.8rem;
+  margin-top: 10px;
+  color: #444;
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid #d4d4d8;
+}
+
+.legend-night {
+  background: rgba(37, 99, 235, 0.28);
+}
+
+.legend-awake {
+  background: rgba(234, 179, 8, 0.45);
+}
+
+.legend-nap {
+  background: rgba(52, 211, 153, 0.45);
+}
+
+.legend-pill-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-pill {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #dc2626;
+  border: 1px solid #991b1b;
+}
+
+/* 테이블 레이아웃 */
+.sleep-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.sleep-table th,
+.sleep-table td {
+  border: 1px solid #e5e7eb;
+  padding: 3px;
+}
+
+.sleep-table thead th {
+  background: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.sleep-table th.date-col {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sleep-cell {
+  height: 22px;
+  background: #ffffff;
+  position: relative;
+  cursor: pointer;
+}
+
+.sleep-cell:hover {
+  outline: 1px solid rgba(148, 163, 184, 0.8);
+  outline-offset: -1px;
+}
+
+/* 수면 타입 색상 */
+.sleep-night {
+  background: rgba(37, 99, 235, 0.28); /* 밤 수면 */
+}
+
+.sleep-awake {
+  background: rgba(234, 179, 8, 0.45); /* 자다 깸 / 깨어있음 */
+}
+
+.sleep-nap {
+  background: rgba(52, 211, 153, 0.45); /* 낮잠 */
+}
+
+/* 약 복용 점 표시 */
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #dc2626;
+  border: 1px solid #991b1b;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+}
+
+.sleep-help {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* 데이터 제어 버튼 */
+.sleep-data-controls {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.btn-ghost {
+  border: 1px solid #d4d4d8;
+  background: #f9fafb;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: #e5e7eb;
+}
+
+@media (max-width: 640px) {
+  .sleep-table th.date-col {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #f9fafb;
+  }
+}

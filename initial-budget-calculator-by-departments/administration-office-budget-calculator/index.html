@@ -9,7 +9,9 @@
   <link rel="stylesheet" href="/static/style.css" />
   <script src="/static/disable-copy.js"></script>
 </head>
+
 <body>
+      <main class="container" style="max-width:880px; margin:0 auto; padding:24px 16px;">
   <header class="site-header">
     <div class="shell">
       <h1>교육행정실 예산 계산기</h1>
@@ -19,9 +21,13 @@
     </div>
   </header>
 
-  <main>
+
+
+<!-- ================================ 구분선 ================================ -->
     <section class="section">
       <h2>1. 기본 정보</h2>
+      <hr>
+
       <form id="aoForm">
         <div class="grid-3">
           <div class="field">
@@ -30,10 +36,10 @@
           </div>
           <div class="field">
             <label for="aoWriter">작성자</label>
-            <input id="aoWriter" type="text" placeholder="예: 고주무관" />
+            <input id="aoWriter" type="text" placeholder="예: 귀염둥이 고주무관" />
           </div>
           <div class="field">
-            <label>사업부서</label>
+            <label>사업 부서</label>
             <input type="text" value="교육행정실" disabled />
           </div>
         </div>
@@ -47,9 +53,11 @@
           <a href="/" class="btn-home">메인으로 돌아가기</a>
         </div>
 
-        <hr>
 
+<!-- ================================ 구분선 ================================ -->
+            <section class="section">
         <h2>2. 항목 입력</h2>
+        <hr>
         <div class="table-wrapper">
           <table class="tbl" id="aoTable">
             <thead>
@@ -68,12 +76,15 @@
         </div>
 
         <div class="field" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" id="aoAddRowBtn" class="btn-ghost">+ 행 추가</button>
+          <button type="button" id="aoAddRowBtn" class="btn-ghost">행 추가</button>
           <button type="button" id="aoClearRowsBtn" class="btn-ghost">전체 삭제</button>
         </div>
 
-        <hr>
+            </section>
 
+
+<!-- ================================ 구분선 ================================ -->
+            <section class="section">
         <h2>3. 결과 요약</h2>
         <div id="aoSummaryBox" class="card result">
           <p class="muted">교육행정실 예산의 카테고리별 소계와 총계가 표시됩니다.</p>
@@ -90,22 +101,40 @@
         </div>
       </form>
     </section>
+
+<!-- ================================ 구분선 ================================ -->
+
+        
   </main>
 
-  <footer class="site-footer">
-    <div class="shell" style="text-align:center;">
-      <p>행정실 예산은 내 손 안에서 놀아라 · 씩씩한 고주무관 셀프지원</p>
-<div class="home-link-wrap">
-  <a href="/" class="btn-home">메인 페이지로 돌아가기</a>
-  <a href="/initial-budget-calculator-by-departments/" class="btn-home">
-    부서별 본예산 목록으로 돌아가기
-  </a>
-</div>
+  
+
+
+
 
 
 <script src="/static/budget-core.js?v=1"></script>
   <script src="/initial-budget-calculator-by-departments/administration-office-budget-calculator/app.js"></script>
   <script src="/static/global-loader.js?v=1"></script>
+  
 </body>
+
+  
+  <a href="/initial-budget-calculator-by-departments/" class="btn-home">
+    부서별 본예산 목록으로 돌아가기
+  </a>
+  <a href="/" class="btn">메인으로 돌아가기</a>
+
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+
+  
 </html>
+
+
+
+
+
+
 
