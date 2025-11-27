@@ -81,55 +81,82 @@ const parseTimeToMinutes = (s) => {
   return h * 60 + m;
 };
 
-// 대한민국 공휴일(연도별) – 현재 2025년만 반영
-// 출처: 한국관광공사 2025년 공식 공휴일 안내 기준 요약
-// (신정, 설연휴+임시공휴일, 삼일절+대체공휴일, 어린이날, 부처님오신날+대체공휴일,
-//  대통령선거일(임시공휴일), 현충일, 광복절, 개천절, 추석연휴+대체공휴일, 한글날, 성탄절)
-const HOLIDAYS_KR = {
+// ---------------- 공휴일 관련 ----------------
+
+// 매년 날짜가 고정된 양력 공휴일 (모든 연도 자동 반영)
+const FIXED_SOLAR_HOLIDAYS = [
+  "01-01", // 신정
+  "03-01", // 삼일절
+  "05-05", // 어린이날
+  "06-06", // 현충일
+  "08-15", // 광복절
+  "10-03", // 개천절
+  "10-09", // 한글날
+  "12-25", // 성탄절
+];
+
+// 연도별 개별 공휴일/대체공휴일/임시공휴일/음력휴일
+// 필요할 때 여기 연도별로 계속 추가하면 됨.
+const EXTRA_YEARLY_HOLIDAYS = {
   2025: [
-    "2025-01-01", // 신정
-    "2025-01-27", // 설 임시공휴일
+    // 설 연휴 + 임시공휴일
+    "2025-01-27",
     "2025-01-28",
     "2025-01-29",
     "2025-01-30",
-    "2025-03-01", // 삼일절
-    "2025-03-03", // 대체공휴일
-    "2025-05-05", // 어린이날 & 부처님오신날
-    "2025-05-06", // 대체공휴일
-    "2025-06-03", // 대통령선거 임시공휴일
-    "2025-06-06", // 현충일
-    "2025-08-15", // 광복절
-    "2025-10-03", // 개천절
-    "2025-10-05", // 추석
+    // 삼일절 대체공휴일
+    "2025-03-03",
+    // 어린이날·부처님오신날 대체공휴일
+    "2025-05-06",
+    // 대통령선거(임시공휴일)
+    "2025-06-03",
+    // 추석 연휴 + 대체공휴일
+    "2025-10-05",
     "2025-10-06",
     "2025-10-07",
-    "2025-10-08", // 추석 대체
-    "2025-10-09", // 한글날
-    "2025-12-25", // 성탄절
+    "2025-10-08",
   ],
-  // 2026년 이후는 필요 시 여기에 추가
+  // 예: 2026: ["2026-02-xx", ...] 이런 식으로 추가
 };
 
 // 기간 내 자동 공휴일 집합 만들기
+// 1) FIXED_SOLAR_HOLIDAYS 는 연도 상관없이 전부 자동
+// 2) EXTRA_YEARLY_HOLIDAYS 에 적힌 건 해당 연도에 한해 추가
 const getAutoHolidays = (start, end) => {
   const set = new Set();
   if (!(start && end)) return set;
 
-  for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
-    const list = HOLIDAYS_KR[y];
-    if (!list) continue;
-    for (const d of list) {
-      const dt = parseDate(d);
+  const startYear = start.getFullYear();
+  const endYear = end.getFullYear();
+
+  for (let y = startYear; y <= endYear; y++) {
+    // 양력 고정 공휴일
+    for (const md of FIXED_SOLAR_HOLIDAYS) {
+      const ds = `${y}-${md}`;
+      const dt = parseDate(ds);
       if (!dt) continue;
       if (isSameOrAfter(dt, start) && isSameOrBefore(dt, end)) {
-        set.add(d);
+        set.add(ds);
+      }
+    }
+
+    // 연도별 추가 휴일
+    const extra = EXTRA_YEARLY_HOLIDAYS[y];
+    if (extra && extra.length > 0) {
+      for (const ds of extra) {
+        const dt = parseDate(ds);
+        if (!dt) continue;
+        if (isSameOrAfter(dt, start) && isSameOrBefore(dt, end)) {
+          set.add(ds);
+        }
       }
     }
   }
   return set;
 };
 
-// 요일 ID들
+// ---------------- 요일 입력 관련 ----------------
+
 const DAY_IDS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_HOUR_IDS = {
   mon: "#monHours",
@@ -150,7 +177,8 @@ const DAY_TIME_IDS = {
   sun: { start: "#sunStart", end: "#sunEnd" },
 };
 
-// 메인 계산 함수
+// ---------------- 메인 계산 ----------------
+
 const calc = () => {
   const start = parseDate($("#startDate")?.value);
   const end = parseDate($("#endDate")?.value);
@@ -356,7 +384,8 @@ const calc = () => {
   });
 };
 
-// 결과 표시
+// ---------------- 결과 표시 ----------------
+
 const showResult = (o) => {
   const {
     basePay = 0,
@@ -412,7 +441,8 @@ const showResult = (o) => {
   }
 };
 
-// DOM 로드 후 이벤트 바인딩
+// ---------------- DOM 로드 후 바인딩 ----------------
+
 document.addEventListener("DOMContentLoaded", () => {
   // 기본 모드: 시간
   document.body.classList.add("mode-hours");
