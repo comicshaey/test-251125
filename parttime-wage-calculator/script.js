@@ -56,7 +56,7 @@ const nextWeekKeyOf = (weekKey) => {
   const nextMon = addDays(mon, 7);
 
   const nmm = String(nextMon.getMonth() + 1).padStart(2, "0");
-  const ndd = String(nextMon.getDate()).padStart(2, "0");
+  const ndd = String(nextMon.getDate() + 0).padStart(2, "0");
   return `${nextMon.getFullYear()}-W${nmm}${ndd}`;
 };
 
@@ -69,8 +69,6 @@ const groupBy = (arr, keyFn) => {
   }
   return m;
 };
-
-const hasAnyPlannedWork = (weekArr) => weekArr.some((it) => it.paidHours > 0);
 
 // "HH:MM" → 분 단위 숫자
 const parseTimeToMinutes = (s) => {
@@ -129,7 +127,7 @@ const calc = () => {
     document.querySelector('input[name="timeInputMode"]:checked')?.value ||
     "hours";
 
-  // 요일별 계획 읽기
+  // 요일별 패턴(소정근로시간) 읽기
   const workPlan = {};
   for (const id of DAY_IDS) {
     const checked = $(`#${id}`)?.checked || false;
@@ -176,12 +174,12 @@ const calc = () => {
     return;
   }
 
-  // "주 소정 근무시간"은 패턴 기준(한 주에 월~일 계획만 합산)
+  // "주 소정 근무시간"은 패턴 기준(한 주에 월~일 계획만 합산, 제외일과 무관)
   const weeklyRaw = DAY_IDS.reduce(
     (sum, id) => sum + (workPlan[id].checked ? workPlan[id].rawHrs : 0),
     0
   );
-  const weeklyPaid = DAY_IDS.reduce(
+  const weeklyPaidPattern = DAY_IDS.reduce(
     (sum, id) => sum + (workPlan[id].checked ? workPlan[id].paidHrs : 0),
     0
   );
@@ -193,26 +191,33 @@ const calc = () => {
 
   for (let d = new Date(start); isSameOrBefore(d, end); d = addDays(d, 1)) {
     const dateStr = ymd(d);
-
-    // 공휴일·제외일: 아예 계산에서 빼버림
-    if (excludeSet.has(dateStr)) {
-      excludedCount += 1;
-      continue;
-    }
+    const isExcluded = excludeSet.has(dateStr);
 
     const kn = dayToKoreaNum(d);
     const key = mapIdxToKey[kn];
     const plan = workPlan[key];
-    const planned = !!(plan && plan.checked && plan.rawHrs > 0);
-    const paid = planned ? plan.paidHrs : 0;
+
+    // 원래 패턴상 소정근로일인지
+    const isScheduledBase = !!(plan && plan.checked && plan.rawHrs > 0);
+    // 제외일은 소정근로일에서 빼준다
+    const scheduledWork = isScheduledBase && !isExcluded;
+
+    let paid = 0;
+    if (scheduledWork) {
+      paid = plan.paidHrs;
+    }
+
+    if (isExcluded) {
+      excludedCount += 1;
+    }
 
     daysArr.push({
       date: new Date(d),
       ymd: dateStr,
       weekNoKey: weekKeyMonToSun(d),
       isSunday: kn === 7,
-      planned,
-      paidHours: paid,
+      scheduledWork,   // 해당 날짜가 '그 주의 소정 근로일'인지(제외일 반영 후)
+      paidHours: paid, // 유급근로시간
     });
   }
 
@@ -232,15 +237,26 @@ const calc = () => {
     const wk = weeks[wkKey];
 
     const weeklyHours = wk.reduce((sum, it) => sum + it.paidHours, 0);
-    const weeklyWorkDays = wk.filter((it) => it.paidHours > 0).length;
+    const weeklyScheduledDays = wk.filter((it) => it.scheduledWork).length;
+    const weeklyActualWorkDays = wk.filter((it) => it.paidHours > 0).length;
 
-    // 다음 주에 근로가 계획되어 있는지
+    // 요건 1: 주당 근무시간 15시간 이상 (실제 유급시간 기준)
+    const cond1 = weeklyHours >= 15;
+
+    // 요건 2: 해당 주간 소정 근로일 모두 근무
+    //  -> 소정근로일(제외일 반영 후) 수와 실제 유급근로일 수가 같아야 함
+    const cond2 =
+      weeklyScheduledDays > 0 &&
+      weeklyScheduledDays === weeklyActualWorkDays;
+
+    // 요건 3: 다음 주에 근무 예정(소정근로일 존재)
     const nextKey = nextWeekKeyOf(wkKey);
-    const hasNext = Object.prototype.hasOwnProperty.call(weeks, nextKey)
-      ? hasAnyPlannedWork(weeks[nextKey])
-      : false;
+    const nextWeek = weeks[nextKey];
+    const hasNextScheduled =
+      !!nextWeek && nextWeek.some((it) => it.scheduledWork);
+    const cond3 = hasNextScheduled;
 
-    // 이번 주 안에 실제 "일요일"이 존재하는지
+    // 해당 주에 '일요일'이 달력상 존재하는지 (계약 기간 안에서)
     const sundayInside = wk.some(
       (it) =>
         it.isSunday &&
@@ -248,9 +264,12 @@ const calc = () => {
         isSameOrBefore(it.date, end)
     );
 
-    // 설 연휴 전체를 제외일로 넣으면, 그 주의 일요일도 daysArr에 안 들어오므로 sundayInside = false → 주휴수당 없음
-    if (weeklyHours >= 15 && hasNext && sundayInside && weeklyWorkDays > 0) {
-      const avgDailyPaidHrs = weeklyHours / weeklyWorkDays; // 1일 평균 유급시간
+    if (cond1 && cond2 && cond3 && sundayInside) {
+      // 1일 평균 유급시간 × 시급 = 주휴 1일분
+      const avgDailyPaidHrs =
+        weeklyActualWorkDays > 0
+          ? weeklyHours / weeklyActualWorkDays
+          : 0;
       jhuRawSum += avgDailyPaidHrs * hourly;
       jhuDaysCount += 1;
     }
@@ -275,7 +294,7 @@ const calc = () => {
     workDays: workDayCount,
     jhuDays: jhuDaysCount,
     weeklyRaw,
-    weeklyPaid,
+    weeklyPaid: weeklyPaidPattern,
     excludedDays: excludedCount,
     remainBase,
     remainJhu,
@@ -344,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 기본 모드: 시간
   document.body.classList.add("mode-hours");
 
-  // 모드 토글
+  // 모드 토글(시간 / 시각)
   const modeRadios = document.querySelectorAll('input[name="timeInputMode"]');
   modeRadios.forEach((r) => {
     r.addEventListener("change", () => {
