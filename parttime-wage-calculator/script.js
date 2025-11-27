@@ -56,7 +56,7 @@ const nextWeekKeyOf = (weekKey) => {
   const nextMon = addDays(mon, 7);
 
   const nmm = String(nextMon.getMonth() + 1).padStart(2, "0");
-  const ndd = String(nextMon.getDate() + 0).padStart(2, "0");
+  const ndd = String(nextMon.getDate()).padStart(2, "0");
   return `${nextMon.getFullYear()}-W${nmm}${ndd}`;
 };
 
@@ -79,6 +79,54 @@ const parseTimeToMinutes = (s) => {
   const m = Number(parts[1]);
   if (Number.isNaN(h) || Number.isNaN(m)) return null;
   return h * 60 + m;
+};
+
+// 대한민국 공휴일(연도별) – 현재 2025년만 반영
+// 출처: 한국관광공사 2025년 공식 공휴일 안내 기준 요약
+// (신정, 설연휴+임시공휴일, 삼일절+대체공휴일, 어린이날, 부처님오신날+대체공휴일,
+//  대통령선거일(임시공휴일), 현충일, 광복절, 개천절, 추석연휴+대체공휴일, 한글날, 성탄절)
+const HOLIDAYS_KR = {
+  2025: [
+    "2025-01-01", // 신정
+    "2025-01-27", // 설 임시공휴일
+    "2025-01-28",
+    "2025-01-29",
+    "2025-01-30",
+    "2025-03-01", // 삼일절
+    "2025-03-03", // 대체공휴일
+    "2025-05-05", // 어린이날 & 부처님오신날
+    "2025-05-06", // 대체공휴일
+    "2025-06-03", // 대통령선거 임시공휴일
+    "2025-06-06", // 현충일
+    "2025-08-15", // 광복절
+    "2025-10-03", // 개천절
+    "2025-10-05", // 추석
+    "2025-10-06",
+    "2025-10-07",
+    "2025-10-08", // 추석 대체
+    "2025-10-09", // 한글날
+    "2025-12-25", // 성탄절
+  ],
+  // 2026년 이후는 필요 시 여기에 추가
+};
+
+// 기간 내 자동 공휴일 집합 만들기
+const getAutoHolidays = (start, end) => {
+  const set = new Set();
+  if (!(start && end)) return set;
+
+  for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+    const list = HOLIDAYS_KR[y];
+    if (!list) continue;
+    for (const d of list) {
+      const dt = parseDate(d);
+      if (!dt) continue;
+      if (isSameOrAfter(dt, start) && isSameOrBefore(dt, end)) {
+        set.add(d);
+      }
+    }
+  }
+  return set;
 };
 
 // 요일 ID들
@@ -113,14 +161,18 @@ const calc = () => {
   const breakMinutes = Number($("#breakMinutes")?.value) || 0;
   const breakHours = breakEnabled ? Math.max(0, breakMinutes / 60) : 0;
 
-  // 공휴일·계약 제외일 입력값 파싱
+  // 추가 제외일 입력값 파싱
   const excludeRaw = $("#excludeDates")?.value || "";
-  const excludeSet = new Set(
+  const manualExcludeSet = new Set(
     excludeRaw
       .split(/[\s,]+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
   );
+
+  // 공휴일 자동 반영 여부
+  const autoHolidayEnabled = $("#autoHoliday")?.checked || false;
+  const autoHolidaySet = autoHolidayEnabled ? getAutoHolidays(start, end) : new Set();
 
   // 입력 방식 (시간 / 시각)
   const mode =
@@ -191,7 +243,10 @@ const calc = () => {
 
   for (let d = new Date(start); isSameOrBefore(d, end); d = addDays(d, 1)) {
     const dateStr = ymd(d);
-    const isExcluded = excludeSet.has(dateStr);
+
+    const isManualExcluded = manualExcludeSet.has(dateStr);
+    const isAutoHoliday = autoHolidaySet.has(dateStr);
+    const isExcluded = isManualExcluded || isAutoHoliday;
 
     const kn = dayToKoreaNum(d);
     const key = mapIdxToKey[kn];
@@ -199,7 +254,7 @@ const calc = () => {
 
     // 원래 패턴상 소정근로일인지
     const isScheduledBase = !!(plan && plan.checked && plan.rawHrs > 0);
-    // 제외일은 소정근로일에서 빼준다
+    // 제외일(공휴일 포함)은 소정근로일에서 빼준다
     const scheduledWork = isScheduledBase && !isExcluded;
 
     let paid = 0;
@@ -228,7 +283,7 @@ const calc = () => {
   const baseHours = daysArr.reduce((sum, it) => sum + it.paidHours, 0);
   const basePay = floor10(baseHours * hourly);
 
-  // 주휴수당 계산
+  // 주휴수당 계산 (3요건 자동 적용)
   const weeks = groupBy(daysArr, (it) => it.weekNoKey);
   let jhuRawSum = 0;
   let jhuDaysCount = 0;
@@ -244,7 +299,6 @@ const calc = () => {
     const cond1 = weeklyHours >= 15;
 
     // 요건 2: 해당 주간 소정 근로일 모두 근무
-    //  -> 소정근로일(제외일 반영 후) 수와 실제 유급근로일 수가 같아야 함
     const cond2 =
       weeklyScheduledDays > 0 &&
       weeklyScheduledDays === weeklyActualWorkDays;
@@ -325,7 +379,7 @@ const showResult = (o) => {
     const parts = [];
     parts.push(`실근로일 ${workDays}일`);
     parts.push(`유급주휴일 ${jhuDays}일`);
-    if (excludedDays > 0) parts.push(`제외일 ${excludedDays}일`);
+    if (excludedDays > 0) parts.push(`제외일(공휴일 포함) ${excludedDays}일`);
     lineEl.textContent = parts.join(" · ") + ` → 총 ${paidDays}일 유급`;
   }
 
